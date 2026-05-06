@@ -61,14 +61,14 @@ def main():
         num_elites=10,
         num_rollouts=60,
         num_turns=3,
-        output_file="cem_llama3_50r_10/60elites.json",
+        output_file="cem_llama3_50r_10e_60r.json",
         age_mean = 25.0,
         age_std = 10.0,
         age_clip = (10.0, 80.0),
         num_boolean_traits=len(boolean_trait_names),
         beta_init_alpha = 1.0,
         beta_init_beta = 1.0,
-        beta_concentration=10.0,   # tune
+        beta_concentration=5.0,   # tune
         binarize_booleans=True,
     )
 
@@ -76,8 +76,8 @@ def main():
         simulator=sim,
         trait_space=trait_space,
         cfg=cem_cfg,
-        harm_score_fn= wildguard_harm_score,
-        #harm_score_fn=lambda s: wildguard_harm_score(s, aggregate="max"),
+        #harm_score_fn= wildguard_harm_score,
+        harm_score_fn=lambda s: wildguard_harm_score(s, aggregate="max"),
         wandb_project="NonAdv",
         wandb_run_name="CEM_Run_test",
     )
