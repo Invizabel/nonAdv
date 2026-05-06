@@ -1,2 +1,5 @@
 # ignore old drafts of code
 old/
+wandb/
+examples/__pycache__/
+simvbg/__pycache__/

@@ -102,7 +102,7 @@ def main() -> None:
         ),
     ]
 
-    # Try different targets if you want
+    # Try different targets 
     scoring_target = "harmful_response"   # or "response_refusal" or "harmful_request"
     aggregate = "mean"                   # or "max" or "last"
 

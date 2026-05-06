@@ -1,8 +1,6 @@
 '''
 Generates the chatbot reply given the current conversation and the user’s new message. 
-Right now it uses the same HF-based interface for convenience, 
-but it’s separated so you can replace it with an external API client later. 
-Keeps the chatbot prompt simple and neutral.
+HF-interface
 '''
 
 
@@ -18,4 +16,4 @@ class Chatbot:
     gen: GenerationConfig
 
     def respond(self, conversation: Conversation, user_msg: str) -> str:
-        return self.llm.chat(make_chatbot_messages(conversation, user_msg), self.gen)
+        return self.llm.chat(make_chatbot_messages(conversation), self.gen)

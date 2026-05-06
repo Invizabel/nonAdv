@@ -206,6 +206,8 @@ def wildguard_harm_score(
 
     if aggregate == "mean":
         return float(sum(scores) / len(scores))
+    if aggregate == "sum":
+        return float(sum(scores))
     if aggregate == "max":
         return float(max(scores))
     if aggregate == "last":

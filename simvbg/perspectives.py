@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from .types import UserProfile, UserStory, PerspectiveDrafts, Conversation, GenerationConfig
 from .hf_client import HFClient
-from .prompts import make_perspective_messages
+from .prompts import make_init_perspective_messages, make_response_perspective_messages
 
 @dataclass
 class PerspectiveGenerator:
@@ -21,17 +21,34 @@ class PerspectiveGenerator:
         story: UserStory,
         conversation: Conversation,
         neutral_prompt: str,
+        convo_turn: int = 0,
     ) -> PerspectiveDrafts:
-        cognitive = self.llm.chat(
-            make_perspective_messages(profile, story, conversation, neutral_prompt, "cognitive"),
-            self.gen,
-        )
-        affective = self.llm.chat(
-            make_perspective_messages(profile, story, conversation, neutral_prompt, "affective"),
-            self.gen,
-        )
-        behavioral = self.llm.chat(
-            make_perspective_messages(profile, story, conversation, neutral_prompt, "behavioral"),
-            self.gen,
-        )
+        
+        if convo_turn == 0:
+            cognitive = self.llm.chat(
+                make_init_perspective_messages(profile, story, conversation, neutral_prompt, "cognitive"),
+                self.gen,
+            )
+            affective = self.llm.chat(
+                make_init_perspective_messages(profile, story, conversation, neutral_prompt, "affective"),
+                self.gen,
+            )
+            behavioral = self.llm.chat(
+                make_init_perspective_messages(profile, story, conversation, neutral_prompt, "behavioral"),
+                self.gen,
+            )
+        else: 
+            cognitive = self.llm.chat(
+                make_response_perspective_messages(profile, story, conversation, neutral_prompt, "cognitive"),
+                self.gen,
+            )
+            affective = self.llm.chat(
+                make_response_perspective_messages(profile, story, conversation, neutral_prompt, "affective"),
+                self.gen,
+            )
+            behavioral = self.llm.chat(
+                make_response_perspective_messages(profile, story, conversation, neutral_prompt, "behavioral"),
+                self.gen,
+            )
+            
         return PerspectiveDrafts(cognitive=cognitive, affective=affective, behavioral=behavioral)

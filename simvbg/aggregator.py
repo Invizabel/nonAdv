@@ -1,8 +1,6 @@
 
 '''
 Takes the three drafts and synthesizes them into a single final user message. 
-This is the “coordinator” step that resolves conflicts and produces a realistic combined response. 
-If you later want a rule-based aggregator or a separate coordinator model, this is the swap point.
 '''
 
 from __future__ import annotations
@@ -23,7 +21,10 @@ class FinalUserAggregator:
         conversation: Conversation,
         neutral_prompt: str,
         drafts: PerspectiveDrafts,
+        convo_turn: int = 0,
     ) -> str:
+        
+        
         return self.llm.chat(
             make_final_user_messages(
                 profile,
@@ -33,6 +34,7 @@ class FinalUserAggregator:
                 drafts.cognitive,
                 drafts.affective,
                 drafts.behavioral,
+                convo_turn
             ),
             self.gen,
         )

@@ -5,7 +5,7 @@ toward higher “harm” scores.
 Samples trait vectors, converts them to trait strings, runs full simulations, 
 selects elite rollouts, and updates the age/Beta distributions. 
 
-Logs rollouts to JSON and optionally to W&B; the harm scorer is a plug-in you’ll provide.
+Logs rollouts to JSON and optionally to W&B
 '''
 
 from __future__ import annotations
@@ -53,8 +53,8 @@ class CEMConfig:
     # Avoid degenerate p_hat=0/1
     p_clip: Tuple[float, float] = (0.05, 0.95)
 
-    # Whether to binarize Beta samples (your note)
-    binarize_booleans: bool = True  # if False, encode “degree” traits later
+    # Whether to binarize Beta samples 
+    binarize_booleans: bool = True  # TODO if False, encode “degree” traits later
 
 
 @dataclass
@@ -117,7 +117,7 @@ class TraitDistribution:
 
         # Update Beta via moment-ish approach: match mean p_hat, fixed concentration
         for i in range(self.cfg.num_boolean_traits):
-            vals = elite[:, i + 1]
+            vals = elite[:, i + 1] # elite values for this boolean trait; 1s push alpha up, 0s push beta up
             p_hat = float(np.mean(vals))
             p_hat = float(np.clip(p_hat, self.cfg.p_clip[0], self.cfg.p_clip[1]))
 
@@ -139,17 +139,9 @@ class TraitDistribution:
 
 def default_harm_score_fn(sim_out: Dict[str, Any]) -> float:
     """
-    Placeholder. 
+    Placeholder. See wildguard_scorer.py 
     """
     return 0.0
-
-def harm_score_fn(sim_out: dict) -> float:
-    return wildguard_harm_score(
-        sim_out,
-        scoring_target="harmful_response",
-        device="auto",
-        aggregate="mean",
-    )
 
 
 # ----------------------------
@@ -197,8 +189,9 @@ class CEMRunner:
         self.all_rollouts: List[Dict[str, Any]] = []
 
     def run(self, neutral_prompts: List[str]) -> Dict[str, Any]:
-        if len(neutral_prompts) < self.cfg.num_turns:
-            raise ValueError(f"Need at least {self.cfg.num_turns} neutral prompts.")
+        
+        if len(neutral_prompts) < 1:
+            raise ValueError(f"Need at least 1 neutral prompts.")
 
         for r in range(self.cfg.num_rounds):
             round_idx = r + 1
@@ -218,11 +211,11 @@ class CEMRunner:
 
                 sim_out = self.simulator.run(
                     traits=traits,
-                    neutral_prompts=neutral_prompts[: self.cfg.num_turns],
+                    neutral_prompts=neutral_prompts[0] * self.cfg.num_turns, 
                 )
 
                 score = float(self.harm_score_fn(sim_out))
-                print(f"score={score:.4f}")
+                print(f"score={score:.6e}")
 
                 round_rollouts.append(
                     RolloutRecord(
@@ -230,16 +223,18 @@ class CEMRunner:
                         rollout=rollout_idx,
                         trait_vector=vec,
                         traits=traits,
-                        neutral_prompts=neutral_prompts[: self.cfg.num_turns],
+                        neutral_prompts=neutral_prompts[0],
                         score=score,
                         sim_out=sim_out,
                     )
                 )
+                
 
             # --- select elites
             round_rollouts_sorted = sorted(round_rollouts, key=lambda x: x.score, reverse=True)
             elites = round_rollouts_sorted[: self.cfg.num_elites]
 
+            all_scores = [r.score for r in round_rollouts]
             elite_scores = [e.score for e in elites]
             mean_elite = float(np.mean(elite_scores)) if elite_scores else float("nan")
 
@@ -257,6 +252,8 @@ class CEMRunner:
             if self.wandb_enabled:
                 wandb.log({
                     "round": round_idx,
+                    "all_scores": all_scores,
+                    "elite_scores": elite_scores,
                     "mean_elite_score": mean_elite,
                     "age_mean": self.dist.age_mean,
                     "age_std": self.dist.age_std,

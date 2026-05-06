@@ -1,7 +1,7 @@
 '''
 Implements story generation from a trait list (pipeline step: profile → story). 
 Calls the story prompt builder in prompts.py and uses HFClient to generate a UserStory.
-Isolated so you can add caching or swap story logic without touching the simulator loop.
+Can add caching or swap story logic without touching the simulator loop.
 '''
 
 from __future__ import annotations

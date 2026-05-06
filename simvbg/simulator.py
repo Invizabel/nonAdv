@@ -40,7 +40,9 @@ class SimVBGSimulator:
         6) send to chatbot
         7) repeat until user has generated 3 responses, provide full conversation context
         """
-        assert len(neutral_prompts) >= self.sim_cfg.n_turns, "Need >= n_turns neutral prompts."
+        neutral_prompt = neutral_prompts[0]
+        conversation: Conversation = []
+        conversation.append(Message(role="system", content=f"Scenario prompt:\n{neutral_prompt}"))
 
         # Clients
         user_llm = HFClient(self.user_model_cfg)
@@ -54,19 +56,19 @@ class SimVBGSimulator:
         profile = UserProfile(traits=traits)
         story = story_gen.generate(profile)
 
-        conversation: Conversation = []
         trace = []
 
         for t in range(self.sim_cfg.n_turns):
-            neutral_prompt = neutral_prompts[t]
+            #neutral_prompt = neutral_prompts[t] # removed bc no longer doing a new prompt each turn
 
-            drafts = persp_gen.generate_three(profile, story, conversation, neutral_prompt)
-            user_msg = aggregator.synthesize(profile, story, conversation, neutral_prompt, drafts)
+            drafts = persp_gen.generate_three(profile, story, conversation, neutral_prompt, t)
+            user_msg = aggregator.synthesize(profile, story, conversation, neutral_prompt, drafts, t)
+            conversation.append(Message(role="user", content=user_msg))
+
 
             bot_msg = chatbot.respond(conversation, user_msg)
 
             # update conversation
-            conversation.append(Message(role="user", content=user_msg))
             conversation.append(Message(role="assistant", content=bot_msg))
 
             trace.append({

@@ -1,9 +1,4 @@
 
-## defines the package’s public API by re-exporting the key classes and config dataclasses 
-## (e.g., SimVBGSimulator, ModelConfig, GenerationConfig)
-## allows imports directly from simvbg directly without digging into submodules.
-
-
 from .types import (
     ModelConfig,
     GenerationConfig,
