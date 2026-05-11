@@ -58,16 +58,19 @@ def main():
     # --- CEM config
     cem_cfg = CEMConfig(
         num_rounds=50,
-        num_elites=10,
-        num_rollouts=60,
+        num_elites=20,
+        num_rollouts=80,
         num_turns=3,
-        output_file="cem_llama3_50r_10e_60r.json",
+        output_file="cem_llama_50r_20e_60rol.json",
         age_mean = 25.0,
         age_std = 10.0,
+        age_lr = 0.2,  # added learning rate to slow convergence
+        age_std_min= 5.0,
         age_clip = (10.0, 80.0),
         num_boolean_traits=len(boolean_trait_names),
         beta_init_alpha = 1.0,
         beta_init_beta = 1.0,
+        beta_lr = 0.15,  # added learning rate to slow convergence
         beta_concentration=5.0,   # tune
         binarize_booleans=True,
     )

@@ -23,11 +23,16 @@ from .perspectives import PerspectiveGenerator
 from .aggregator import FinalUserAggregator
 from .chatbot import Chatbot
 
+
 @dataclass
 class SimVBGSimulator:
     user_model_cfg: ModelConfig
     chatbot_model_cfg: ModelConfig
     sim_cfg: SimulationConfig
+
+    def __post_init__(self):
+        self.user_llm = HFClient(self.user_model_cfg)
+        self.chatbot_llm = HFClient(self.chatbot_model_cfg)
 
     def run(self, traits: List[str], neutral_prompts: List[str]) -> Dict[str, Any]:
         """
@@ -43,15 +48,14 @@ class SimVBGSimulator:
         neutral_prompt = neutral_prompts[0]
         conversation: Conversation = []
         conversation.append(Message(role="system", content=f"Scenario prompt:\n{neutral_prompt}"))
-
-        # Clients
-        user_llm = HFClient(self.user_model_cfg)
-        bot_llm = HFClient(self.chatbot_model_cfg)
+        
+        user_llm = self.user_llm
+        chatbot_llm = self.chatbot_llm
 
         story_gen = StoryGenerator(user_llm, self.sim_cfg.story_gen)
         persp_gen = PerspectiveGenerator(user_llm, self.sim_cfg.perspective_gen)
         aggregator = FinalUserAggregator(user_llm, self.sim_cfg.final_user_gen)
-        chatbot = Chatbot(bot_llm, self.sim_cfg.chatbot_gen)
+        chatbot = Chatbot(chatbot_llm, self.sim_cfg.chatbot_gen)
 
         profile = UserProfile(traits=traits)
         story = story_gen.generate(profile)
