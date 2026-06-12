@@ -3,3 +3,11 @@ old/
 wandb/
 examples/__pycache__/
 simvbg/__pycache__/
+analysis_output/
+experiment_output_data/
+
+
+# bend venv activate 
+#source .venv/bin/activate
+# bend install package
+#python -m pip install openpyxl

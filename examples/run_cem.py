@@ -12,11 +12,11 @@ def main():
     # user_model = ModelConfig(model_id="TinyLlama/TinyLlama-1.1B-Chat-v1.0", device="auto", dtype="auto")
     # bot_model  = ModelConfig(model_id="TinyLlama/TinyLlama-1.1B-Chat-v1.0", device="auto", dtype="auto")
 
-    # user_model = ModelConfig(model_id="meta-llama/Llama-3.2-3B-Instruct", device="auto", dtype="auto")
-    # bot_model  = ModelConfig(model_id="meta-llama/Llama-3.2-3B-Instruct", device="auto", dtype="auto")
+    user_model = ModelConfig(model_id="meta-llama/Llama-3.2-3B-Instruct", device="auto", dtype="auto")
+    bot_model  = ModelConfig(model_id="meta-llama/Llama-3.2-3B-Instruct", device="auto", dtype="auto")
     
-    user_model = ModelConfig(model_id="Qwen/Qwen3.5-35B-A3B", device="auto", dtype="auto")
-    bot_model  = ModelConfig(model_id="Qwen/Qwen3.5-35B-A3B", device="auto", dtype="auto")
+    # user_model = ModelConfig(model_id="Qwen/Qwen3.5-35B-A3B", device="auto", dtype="auto")
+    # bot_model  = ModelConfig(model_id="Qwen/Qwen3.5-35B-A3B", device="auto", dtype="auto")
     
     sim_cfg = SimulationConfig(
         story_gen=GenerationConfig(max_new_tokens=220, temperature=0.7),
